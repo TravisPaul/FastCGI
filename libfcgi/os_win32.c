@@ -129,6 +129,16 @@ static HANDLE hListen = INVALID_HANDLE_VALUE;
 
 static BOOLEAN libInitialized = FALSE;
 
+HANDLE strToHandle(char *str)
+{
+#ifdef _WIN64
+    return (HANDLE)_atoi64(str);
+#else
+    return (HANDLE)atoi(str);
+#endif
+}
+
+
 /*
  *--------------------------------------------------------------
  *
@@ -227,7 +237,7 @@ static int Win32NewDescriptor(FILE_TYPE type, int fd, int desiredFd)
 static void StdinThread(void * startup) 
 {
     int doIo = TRUE;
-    unsigned long fd;
+    ULONG_PTR fd;
     unsigned long bytesRead;
     POVERLAPPED_REQUEST pOv;
 
@@ -357,7 +367,7 @@ int OS_LibInit(int stdioFds[3])
     val = getenv(SHUTDOWN_EVENT_NAME);
     if (val != NULL) 
     {
-        HANDLE shutdownEvent = (HANDLE) atoi(val);
+        HANDLE shutdownEvent = strToHandle(val);
 
         if (_beginthread(ShutdownRequestThread, 0, shutdownEvent) == -1)
         {
@@ -371,7 +381,7 @@ int OS_LibInit(int stdioFds[3])
         val = getenv(MUTEX_VARNAME);
         if (val != NULL) 
         {
-            acceptMutex = (HANDLE) atoi(val);
+            acceptMutex = strToHandle(val);
         }
     }
 
@@ -460,8 +470,10 @@ int OS_LibInit(int stdioFds[3])
  */
     }
 
+    ASSERT(INT_MIN <= (intptr_t)stdioHandles[STDIN_FILENO] && 
+           (intptr_t)stdioHandles[STDIN_FILENO] <= INT_MAX);
     if ((fakeFd = Win32NewDescriptor(FD_PIPE_SYNC,
-				     (int)stdioHandles[STDIN_FILENO],
+                                     (int)(intptr_t)stdioHandles[STDIN_FILENO],
 				     STDIN_FILENO)) == -1) {
         return -1;
     } else {
@@ -494,7 +506,7 @@ int OS_LibInit(int stdioFds[3])
     if((cLenPtr = getenv("CONTENT_LENGTH")) != NULL &&
        atoi(cLenPtr) > 0) {
         hStdinThread = (HANDLE) _beginthread(StdinThread, 0, NULL);
-	if (hStdinThread == (HANDLE) -1) {
+        if (hStdinThread == (HANDLE)(LONG_PTR) -1) {
 	    printf("<H2>OS_LibInit Failed to create STDIN thread!  ERROR: %d</H2>\r\n\r\n",
 		   GetLastError());
 	    return -1;
@@ -515,8 +527,10 @@ int OS_LibInit(int stdioFds[3])
 	exit(99);
     }
 
+    ASSERT(INT_MIN <= (intptr_t)stdioHandles[STDOUT_FILENO] &&
+           (intptr_t)stdioHandles[STDOUT_FILENO] <= INT_MAX);
     if ((fakeFd = Win32NewDescriptor(FD_PIPE_SYNC,
-				     (int)stdioHandles[STDOUT_FILENO],
+                                     (int)(intptr_t)stdioHandles[STDOUT_FILENO],
 				     STDOUT_FILENO)) == -1) {
         return -1;
     } else {
@@ -532,8 +546,10 @@ int OS_LibInit(int stdioFds[3])
         DebugBreak();
 	exit(99);
     }
+    ASSERT(INT_MIN <= (intptr_t)stdioHandles[STDERR_FILENO] &&
+           (intptr_t)stdioHandles[STDERR_FILENO] <= INT_MAX);
     if ((fakeFd = Win32NewDescriptor(FD_PIPE_SYNC,
-				     (int)stdioHandles[STDERR_FILENO],
+                                     (int)(intptr_t)stdioHandles[STDERR_FILENO],
 				     STDERR_FILENO)) == -1) {
         return -1;
     } else {
@@ -735,7 +751,9 @@ int OS_CreateLocalIpcFd(const char *bindPath, int backlog)
 	        return -5;
 	    }
 
-        pseudoFd = Win32NewDescriptor(listenType, listenSock, -1);
+        ASSERT(INT_MIN <= (intptr_t)listenSock &&
+               (intptr_t)listenSock <= INT_MAX);
+        pseudoFd = Win32NewDescriptor(listenType, (int)(intptr_t)listenSock, -1);
         
         if (pseudoFd == -1) 
         {
@@ -776,7 +794,9 @@ int OS_CreateLocalIpcFd(const char *bindPath, int backlog)
             return -9;
         }
 
-        pseudoFd = Win32NewDescriptor(listenType, (int) hListenPipe, -1);
+        ASSERT(INT_MIN <= (intptr_t)hListenPipe &&
+               (intptr_t)hListenPipe <= INT_MAX);
+        pseudoFd = Win32NewDescriptor(listenType, (int)(intptr_t)hListenPipe, -1);
         
         if (pseudoFd == -1) 
         {
@@ -822,7 +842,7 @@ int OS_FcgiConnect(char *bindPath)
         if (*bindPath != ':')
         {
             char * p = strchr(bindPath, ':');
-            int len = p - bindPath;
+            intptr_t len = p - bindPath;
             host = malloc(len + 1);
             memcpy(host, bindPath, len);
             host[len] = '\0';
@@ -858,7 +878,8 @@ int OS_FcgiConnect(char *bindPath)
 	        return -1;
 	    }
 
-	    pseudoFd = Win32NewDescriptor(FD_SOCKET_SYNC, sock, -1);
+        ASSERT(INT_MIN <= (intptr_t)sock && (intptr_t)sock <= INT_MAX);
+        pseudoFd = Win32NewDescriptor(FD_SOCKET_SYNC, (int)(intptr_t)sock, -1);
 	    if (pseudoFd == -1) 
         {
 	        closesocket(sock);
@@ -893,7 +914,8 @@ int OS_FcgiConnect(char *bindPath)
             return -1;
         }
 
-        pseudoFd = Win32NewDescriptor(FD_PIPE_ASYNC, (int) hPipe, -1);
+        ASSERT(INT_MIN <= (intptr_t)hPipe && (intptr_t)hPipe <= INT_MAX);
+        pseudoFd = Win32NewDescriptor(FD_PIPE_ASYNC, (int)(intptr_t)hPipe, -1);
         
         if (pseudoFd == -1) 
         {
@@ -948,7 +970,8 @@ int OS_Read(int fd, char * buf, size_t len)
 	case FD_PIPE_SYNC:
 	case FD_PIPE_ASYNC:
 
-	    if (ReadFile(fdTable[fd].fid.fileHandle, buf, len, &bytesRead, NULL)) 
+        ASSERT(0 <= len && len <= ULONG_MAX);
+        if (ReadFile(fdTable[fd].fid.fileHandle, buf, (DWORD)len, &bytesRead, NULL)) 
         {
             ret = bytesRead;
         }
@@ -962,7 +985,8 @@ int OS_Read(int fd, char * buf, size_t len)
 	case FD_SOCKET_SYNC:
 	case FD_SOCKET_ASYNC:
 
-        ret = recv(fdTable[fd].fid.sock, buf, len, 0);
+        ASSERT(0 <= len && len <= INT_MAX);
+        ret = recv(fdTable[fd].fid.sock, buf, (int)len, 0);
 	    if (ret == SOCKET_ERROR) 
         {
 		    fdTable[fd].Errno = WSAGetLastError();
@@ -1011,7 +1035,8 @@ int OS_Write(int fd, char * buf, size_t len)
 	case FD_PIPE_SYNC:
 	case FD_PIPE_ASYNC:
 
-        if (WriteFile(fdTable[fd].fid.fileHandle, buf, len, &bytesWritten, NULL)) 
+        ASSERT(0 <= len && len <= ULONG_MAX);
+        if (WriteFile(fdTable[fd].fid.fileHandle, buf, (DWORD)len, &bytesWritten, NULL)) 
         {
             ret = bytesWritten;
         }
@@ -1025,7 +1050,8 @@ int OS_Write(int fd, char * buf, size_t len)
 	case FD_SOCKET_SYNC:
 	case FD_SOCKET_ASYNC:
 
-        ret = send(fdTable[fd].fid.sock, buf, len, 0);
+        ASSERT(0 <= len && len <= INT_MAX);
+        ret = send(fdTable[fd].fid.sock, buf, (int)len, 0);
         if (ret == SOCKET_ERROR) 
         {
 		    fdTable[fd].Errno = WSAGetLastError();
@@ -1390,7 +1416,7 @@ int OS_Close(int fd, int shutdown_ok)
             {
                 struct timeval tv;
                 fd_set rfds;
-                int sock = fdTable[fd].fid.sock;
+                SOCKET sock = fdTable[fd].fid.sock;
                 int rv;
                 char trash[1024];
    
@@ -1399,12 +1425,11 @@ int OS_Close(int fd, int shutdown_ok)
                 do 
                 {
 #pragma warning( disable : 4127 ) 
-	            FD_SET((unsigned) sock, &rfds);
-#pragma warning( default : 4127 )
-                    
+	            FD_SET(sock, &rfds);
+#pragma warning( default : 4127 ) 
 	            tv.tv_sec = 2;
 	            tv.tv_usec = 0;
-	            rv = select(sock + 1, &rfds, NULL, NULL, &tv);
+	            rv = select(0, &rfds, NULL, NULL, &tv);
                 }
                 while (rv > 0 && recv(sock, trash, sizeof(trash), 0) > 0);
             }
@@ -1472,12 +1497,12 @@ int OS_CloseRead(int fd)
  */
 int OS_DoIo(struct timeval *tmo)
 {
-    unsigned long fd;
+    ULONG_PTR fd;
     unsigned long bytes;
     POVERLAPPED_REQUEST pOv;
     struct timeb tb;
-    int ms;
-    int ms_last;
+    time_t ms;
+    time_t ms_last;
     int err;
 
     /* XXX
@@ -1495,8 +1520,9 @@ int OS_DoIo(struct timeval *tmo)
     while (ms >= 0) {
 	if(tmo && (ms = tmo->tv_sec*1000 + tmo->tv_usec/1000)> 100)
 	    ms = 100;
+        ASSERT(0 <= ms && ms < 0xFFFFFFFF);
 	if (!GetQueuedCompletionStatus(hIoCompPort, &bytes, &fd,
-	    (LPOVERLAPPED *)&pOv, ms) && !pOv) {
+           (LPOVERLAPPED *)&pOv, (DWORD)ms) && !pOv) {
 	    err = WSAGetLastError();
 	    return 0; /* timeout */
         }
@@ -1551,7 +1577,7 @@ static int CALLBACK isAddrOKCallback(LPWSABUF  lpCallerId,
                                      LPWSABUF  dc3,
                                      LPWSABUF  dc4,
                                      GROUP     *dc5,
-                                     DWORD     data)
+                                     DWORD_PTR data)
 {
     struct sockaddr_in *sockaddr = (struct sockaddr_in *) lpCallerId->buf;
 
@@ -1622,7 +1648,8 @@ static int acceptNamedPipe()
         }
     }
 
-    ipcFd = Win32NewDescriptor(FD_PIPE_SYNC, (int) hListen, -1);
+    ASSERT(INT_MIN <= (intptr_t)hListen && (intptr_t)hListen <= INT_MAX);
+    ipcFd = Win32NewDescriptor(FD_PIPE_SYNC, (int)(intptr_t)hListen, -1);
 	if (ipcFd == -1) 
     {
         DisconnectNamedPipe(hListen);
@@ -1649,7 +1676,7 @@ static int acceptSocket(const char *webServerAddrs)
             FD_ZERO(&readfds);
 
 #pragma warning( disable : 4127 ) 
-            FD_SET((unsigned int) hListen, &readfds);
+            FD_SET((SOCKET)hListen, &readfds);
 #pragma warning( default : 4127 ) 
 
             if (select(0, &readfds, NULL, NULL, &timeout) == 0)
@@ -1681,11 +1708,11 @@ static int acceptSocket(const char *webServerAddrs)
 
         closesocket(hSock);
 #else
-        hSock = WSAAccept((unsigned int) hListen,                    
+        hSock = WSAAccept((SOCKET)hListen,                    
                           &sockaddr,  
                           &sockaddrLen,               
                           isAddrOKCallback,  
-                          (DWORD) webServerAddrs);
+                          (DWORD_PTR) webServerAddrs);
 
         if (hSock != INVALID_SOCKET)
         {
@@ -1706,7 +1733,8 @@ static int acceptSocket(const char *webServerAddrs)
         return -1;
     }
     
-    ipcFd = Win32NewDescriptor(FD_SOCKET_SYNC, hSock, -1);
+    ASSERT(INT_MIN <= (intptr_t)hSock && (intptr_t)hSock <= INT_MAX);
+    ipcFd = Win32NewDescriptor(FD_SOCKET_SYNC, (int)(intptr_t)hSock, -1);
 	if (ipcFd == -1) 
     {
 	    closesocket(hSock);
