@@ -25,6 +25,10 @@ static const char rcsid[] = "$Id: fcgiapp.c,v 1.35 2003/06/22 00:16:43 robs Exp 
 #include <string.h>
 #include <sys/types.h>
 
+#ifndef _WIN32
+#include <stdint.h>
+#endif
+
 #include "fcgi_config.h"
 
 #ifdef HAVE_SYS_SOCKET_H
@@ -1269,8 +1273,8 @@ static FCGI_UnknownTypeBody MakeUnknownTypeBody(
  *
  *----------------------------------------------------------------------
  */
-static int AlignInt8(unsigned n) {
-    return (n + 7) & (UINT_MAX - 7);
+static intptr_t AlignInt8(intptr_t n) {
+    return (n + 7) & ~7;
 }
 
 /*
@@ -1284,9 +1288,7 @@ static int AlignInt8(unsigned n) {
  *----------------------------------------------------------------------
  */
 static unsigned char *AlignPtr8(unsigned char *p) {
-    unsigned long u = (unsigned long) p;
-    u = ((u + 7) & (ULONG_MAX - 7)) - u;
-    return p + u;
+    return (unsigned char *)((((uintptr_t)p) + 7) & ~7);
 }
 
 
