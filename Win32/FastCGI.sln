@@ -1,52 +1,25 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authorizer", "authorizer.vcproj", "{88A5500C-18AA-4B0F-AEE3-C55CABB18DEB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authorizer", "authorizer.vcxproj", "{88A5500C-18AA-4B0F-AEE3-C55CABB18DEB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgifcgi", "cgifcgi.vcproj", "{051EF3BB-508D-4889-BD2F-031FF8E970A4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgifcgi", "cgifcgi.vcxproj", "{051EF3BB-508D-4889-BD2F-031FF8E970A4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config_h", "config_h.vcproj", "{2E085508-1D0C-42B5-BE7F-6E2DB9E7A367}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "config_h", "config_h.vcxproj", "{2E085508-1D0C-42B5-BE7F-6E2DB9E7A367}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echo", "echo.vcproj", "{6B8C3F89-D5F8-492C-B23B-DD0EFF60A9AD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echo", "echo.vcxproj", "{6B8C3F89-D5F8-492C-B23B-DD0EFF60A9AD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echo_cpp", "echo-cpp.vcproj", "{6ADE4C83-8B54-4D35-86E7-AC023F241B41}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echo_cpp", "echo-cpp.vcxproj", "{6ADE4C83-8B54-4D35-86E7-AC023F241B41}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echox", "echox.vcproj", "{AF626A54-3D04-4094-92A6-AD41C8678D9E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echox", "echox.vcxproj", "{AF626A54-3D04-4094-92A6-AD41C8678D9E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfcgi", "libfcgi.vcproj", "{F82ABE4E-26B2-402C-B7D4-FD27467B83AA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2E085508-1D0C-42B5-BE7F-6E2DB9E7A367} = {2E085508-1D0C-42B5-BE7F-6E2DB9E7A367}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfcgi", "libfcgi.vcxproj", "{F82ABE4E-26B2-402C-B7D4-FD27467B83AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logdump", "logdump.vcproj", "{6B31DE23-5C91-4105-9942-6C7574453C7A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logdump", "logdump.vcxproj", "{6B31DE23-5C91-4105-9942-6C7574453C7A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "size", "size.vcproj", "{965E3D15-1482-409C-838D-2D8D26A85DC3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "size", "size.vcxproj", "{965E3D15-1482-409C-838D-2D8D26A85DC3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "threaded", "threaded.vcproj", "{A215693F-57FF-486F-AE59-E8532406246D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F82ABE4E-26B2-402C-B7D4-FD27467B83AA} = {F82ABE4E-26B2-402C-B7D4-FD27467B83AA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "threaded", "threaded.vcxproj", "{A215693F-57FF-486F-AE59-E8532406246D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
